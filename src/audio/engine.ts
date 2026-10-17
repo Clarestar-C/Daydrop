@@ -106,13 +106,13 @@ export class SoundscapeEngine {
 
     switch (preset) {
       case 'soft-pad':
-        this.buildSoftPad(ctx, master);
+        this.buildSample(ctx, master, `${import.meta.env.BASE_URL}audio/beach.mp3`);
         break;
       case 'gentle-chimes':
         this.buildGentleChimes(ctx, master, gen);
         break;
       case 'airy-drone':
-        this.buildAiryDrone(ctx, master);
+        this.buildSample(ctx, master, `${import.meta.env.BASE_URL}audio/rain.aac`);
         break;
     }
 
@@ -228,6 +228,27 @@ export class SoundscapeEngine {
     this.nodes.push(n);
   }
 
+
+  /** Play a bundled ambience recording, looped gently. Local file, no network. */
+  private buildSample(ctx: AudioContext, master: GainNode, url: string): void {
+    fetch(url)
+      .then((r) => {
+        if (!r.ok) throw new Error('audio not found');
+        return r.arrayBuffer();
+      })
+      .then((buf) => ctx.decodeAudioData(buf))
+      .then((audioBuf) => {
+        if (!this.playing || this.ctx !== ctx) return; // stopped/switched meanwhile
+        const src = ctx.createBufferSource();
+        src.buffer = audioBuf;
+        src.loop = true;
+        src.connect(master);
+        src.start();
+        this.trackSource(src);
+      })
+      .catch(() => undefined); // stay quiet on failure — artwork still works
+  }
+  
   /** soft-pad: 3 detuned oscillators through a lowpass with a slow filter LFO. */
   private buildSoftPad(ctx: AudioContext, master: GainNode): void {
     const filter = ctx.createBiquadFilter();
