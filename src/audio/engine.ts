@@ -240,12 +240,17 @@ export class SoundscapeEngine {
       .then((buf) => ctx.decodeAudioData(buf))
       .then((audioBuf) => {
         if (!this.playing || this.ctx !== ctx) return; // stopped/switched meanwhile
-        const src = ctx.createBufferSource();
-        src.buffer = audioBuf;
-        src.loop = true;
-        src.connect(master);
-        src.start();
-        this.trackSource(src);
+       const src = ctx.createBufferSource();
+      src.buffer = audioBuf;
+      src.loop = true;
+      const boost = ctx.createGain();
+      boost.gain.value = 1.6; // louder beach/rain — raise up to ~2.5 if still quiet
+      src.connect(boost);
+      boost.connect(master);
+      src.start();
+      this.trackSource(src);
+      this.trackNode(boost);
+
       })
       .catch(() => undefined); // stay quiet on failure — artwork still works
   }
