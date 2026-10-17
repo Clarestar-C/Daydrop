@@ -22,7 +22,7 @@ export default defineConfig({
       // precaches the static app shell only — there are no network calls in the
       // app at all, so runtimeCaching is deliberately omitted.
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,aac,mpeg}'],
         navigateFallback: 'index.html',
       },
       manifest: {
