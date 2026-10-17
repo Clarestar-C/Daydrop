@@ -21,8 +21,9 @@ export default defineConfig({
       // IndexedDB (client-side) and is never sent over the network. The SW
       // precaches the static app shell only — there are no network calls in the
       // app at all, so runtimeCaching is deliberately omitted.
-      workbox: {
+     workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,aac,mpeg}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         navigateFallback: 'index.html',
       },
       manifest: {
