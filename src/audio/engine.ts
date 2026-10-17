@@ -1,5 +1,7 @@
-// Original Web Audio soundscapes for Daydrop — no audio files, no network.
-// Everything is synthesized locally at play time.
+// Daydrop soundscapes — gentle ambience for the bloom reveal.
+// Beach and rain are bundled local audio files; chimes are synthesized
+// live with Web Audio. Everything plays from the device — nothing is
+// streamed and nothing leaves the device.
 //
 // The tone→preset mapping is aesthetic only: it suggests a mood, it does not
 // interpret or respond to the user's emotions in any clinical sense.
@@ -10,16 +12,16 @@ export type PresetKey = 'soft-pad' | 'gentle-chimes' | 'airy-drone';
 
 export const PRESETS: Record<PresetKey, { label: string; description: string }> = {
   'soft-pad': {
-    label: 'Soft Pad',
-    description: 'A warm, slow-breathing chord that fades in gently.',
+    label: 'Beach',
+    description: 'Gentle waves, looped softly.',
   },
   'gentle-chimes': {
     label: 'Gentle Chimes',
     description: 'Sparse pentatonic plucks that drift by every few seconds.',
   },
   'airy-drone': {
-    label: 'Airy Drone',
-    description: 'Two low tones with a breath of filtered air, slowly swelling.',
+    label: 'Rain',
+    description: 'Soft rainfall, looped softly.',
   },
 };
 
@@ -106,7 +108,7 @@ export class SoundscapeEngine {
 
     switch (preset) {
       case 'soft-pad':
-        this.buildSample(ctx, master, `${import.meta.env.BASE_URL}audio/beach.mp3`);
+        this.buildSample(ctx, master, `${import.meta.env.BASE_URL}audio/beach.mpeg`);
         break;
       case 'gentle-chimes':
         this.buildGentleChimes(ctx, master, gen);
@@ -228,7 +230,6 @@ export class SoundscapeEngine {
     this.nodes.push(n);
   }
 
-
   /** Play a bundled ambience recording, looped gently. Local file, no network. */
   private buildSample(ctx: AudioContext, master: GainNode, url: string): void {
     fetch(url)
@@ -247,46 +248,6 @@ export class SoundscapeEngine {
         this.trackSource(src);
       })
       .catch(() => undefined); // stay quiet on failure — artwork still works
-  }
-  
-  /** soft-pad: 3 detuned oscillators through a lowpass with a slow filter LFO. */
-  private buildSoftPad(ctx: AudioContext, master: GainNode): void {
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 700;
-    filter.Q.value = 0.4;
-    filter.connect(master);
-    this.trackNode(filter);
-
-    const lfo = ctx.createOscillator();
-    lfo.type = 'sine';
-    lfo.frequency.value = 0.07;
-    const lfoGain = ctx.createGain();
-    lfoGain.gain.value = 320;
-    lfo.connect(lfoGain);
-    lfoGain.connect(filter.frequency);
-    lfo.start();
-    this.trackSource(lfo);
-    this.trackNode(lfoGain);
-
-    // Cmaj9-ish voicing, low and warm.
-    const freqs = [130.81, 164.81, 196.0, 246.94];
-    freqs.forEach((f, i) => {
-      const osc = ctx.createOscillator();
-      osc.type = i % 2 === 0 ? 'triangle' : 'sine';
-      osc.frequency.value = f;
-      osc.detune.value = i % 2 === 0 ? 4 : -5;
-      const g = ctx.createGain();
-      g.gain.value = 0.22;
-      osc.connect(g);
-      g.connect(filter);
-      // 6s attack fade-in per voice.
-      g.gain.setValueAtTime(0, ctx.currentTime);
-      g.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 6);
-      osc.start();
-      this.trackSource(osc);
-      this.trackNode(g);
-    });
   }
 
   /** gentle-chimes: pentatonic sine plucks, sparse, peak ≤ -18 dBFS. */
@@ -322,58 +283,6 @@ export class SoundscapeEngine {
 
     // First pluck shortly after the pad fades in.
     this.schedulerTimer = setTimeout(pluck, 1200);
-  }
-
-  /** airy-drone: two low sines + looping filtered noise, slow amplitude LFO. */
-  private buildAiryDrone(ctx: AudioContext, master: GainNode): void {
-    const droneGain = ctx.createGain();
-    droneGain.gain.value = 0.16;
-    droneGain.connect(master);
-    this.trackNode(droneGain);
-
-    for (const f of [82.41, 123.47]) {
-      // E2 + B2 — an open fifth.
-      const osc = ctx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.value = f;
-      osc.connect(droneGain);
-      const t = ctx.currentTime;
-      osc.start(t);
-      this.trackSource(osc);
-    }
-
-    // Breath of air: looping white noise through a lowpass, very quiet.
-    const len = ctx.sampleRate * 2;
-    const buffer = ctx.createBuffer(1, len, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
-    noise.loop = true;
-    const noiseFilter = ctx.createBiquadFilter();
-    noiseFilter.type = 'lowpass';
-    noiseFilter.frequency.value = 420;
-    const noiseGain = ctx.createGain();
-    noiseGain.gain.value = 0.028;
-    noise.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
-    noiseGain.connect(master);
-    noise.start();
-    this.trackSource(noise);
-    this.trackNode(noiseFilter);
-    this.trackNode(noiseGain);
-
-    // Slow swell on the whole drone.
-    const lfo = ctx.createOscillator();
-    lfo.type = 'sine';
-    lfo.frequency.value = 0.05;
-    const lfoGain = ctx.createGain();
-    lfoGain.gain.value = 0.06;
-    lfo.connect(lfoGain);
-    lfoGain.connect(droneGain.gain);
-    lfo.start();
-    this.trackSource(lfo);
-    this.trackNode(lfoGain);
   }
 }
 
