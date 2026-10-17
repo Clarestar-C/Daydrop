@@ -1,0 +1,168 @@
+/* Daydrop design tokens + base styles.
+   Component styles belong in src/components.css (owned by the UI layer). */
+
+:root {
+  --paper: #faf6ee;
+  --paper-2: #fffdf8;
+  --ink: #3e3548;
+  --ink-soft: #66707f;
+  --line: #e7dcc9;
+  --rose: #e8a2b8;
+  --blush: #f7dee4;
+  --lavender: #7e93ad;
+  --powder: #9db9d9;
+  --peach: #f0c49c;
+  --sage: #a9c6a4;
+  --accent: #5e7ba0;
+  --accent-deep: #6d4f80;
+  --on-accent: #fffdf8;
+  --ink-inverse: #fffdf8;
+  --veil-text: #fffdf8;
+  --danger: #b3564d;
+  --danger-deep: #9c4a43;
+  --banner: #f6ead2;
+  --cell-empty: #ece5d5;
+  --radius: 18px;
+
+  /* Recommended touch targets (UI layer applies these on interactive components) */
+  --touch-min: 44px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 0 0 0.5em;
+}
+
+p {
+  margin: 0 0 1em;
+}
+
+/* Visible keyboard focus — never removed */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Respect reduced motion everywhere */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Page themes — variable overrides only; component styles are untouched.
+   Daybreak (the default) is the :root block above. Themes never affect
+   mood artwork: TONE_COLORS and mood palettes stay fixed. */
+[data-theme='ocean-mist'] {
+  --paper: #f1f6f9; --paper-2: #ffffff;
+  --ink: #1f3440; --ink-soft: #546e7e; --line: #d2e2ea;
+  --accent: #2a6f88; --accent-deep: #1f5a70;
+  --on-accent: #ffffff; --ink-inverse: #ffffff; --veil-text: #fffdf8;
+  --danger: #b3564d; --danger-deep: #9c4a43;
+  --banner: #dcebf1; --cell-empty: #e1ebef;
+  --rose: #d9a7b8; --blush: #f0dce4; --lavender: #8fa3c8;
+  --powder: #9db9d9; --peach: #eec9a8; --sage: #a9c6a4;
+}
+[data-theme='secret-garden'] {
+  --paper: #f5f2e6; --paper-2: #fffdf5;
+  --ink: #2c3a26; --ink-soft: #5b6951; --line: #dbd3b8;
+  --accent: #476b38; --accent-deep: #36552b;
+  --on-accent: #ffffff; --ink-inverse: #ffffff; --veil-text: #fffdf8;
+  --danger: #b3564d; --danger-deep: #9c4a43;
+  --banner: #e8e3ca; --cell-empty: #e9e3cd;
+  --rose: #d9a7a0; --blush: #f2e2d2; --lavender: #8b9a7e;
+  --powder: #a8bfa0; --peach: #e8c49a; --sage: #a9c6a4;
+}
+[data-theme='lavender-dream'] {
+  --paper: #f4f1fa; --paper-2: #ffffff;
+  --ink: #352e4e; --ink-soft: #655c85; --line: #dbd3ed;
+  --accent: #5a4fa8; --accent-deep: #463d86;
+  --on-accent: #ffffff; --ink-inverse: #ffffff; --veil-text: #fffdf8;
+  --danger: #b3564d; --danger-deep: #9c4a43;
+  --banner: #e3dbf2; --cell-empty: #e5dff1;
+  --rose: #c99ab8; --blush: #e8d8ec; --lavender: #a893d4;
+  --powder: #9d8fd0; --peach: #e5c2d4; --sage: #a9bfa8;
+}
+[data-theme='peach-sunrise'] {
+  --paper: #fdf4ea; --paper-2: #fffdf8;
+  --ink: #4a3220; --ink-soft: #81654b; --line: #edd9c2;
+  --accent: #a05e1d; --accent-deep: #7f4c15;
+  --on-accent: #ffffff; --ink-inverse: #ffffff; --veil-text: #fffdf8;
+  --danger: #b3564d; --danger-deep: #9c4a43;
+  --banner: #f6e6cf; --cell-empty: #f1e4cf;
+  --rose: #e5a08e; --blush: #f7ddd0; --lavender: #c49a7e;
+  --powder: #d4af8a; --peach: #f0c49c; --sage: #b3bf9a;
+}
+[data-theme='rosewater'] {
+  --paper: #faf1ee; --paper-2: #fffdfb;
+  --ink: #472e35; --ink-soft: #7c5e65; --line: #e6d0cf;
+  --accent: #93465a; --accent-deep: #763848;
+  --on-accent: #ffffff; --ink-inverse: #ffffff; --veil-text: #fffdf8;
+  --danger: #b3564d; --danger-deep: #9c4a43;
+  --banner: #f2dcd8; --cell-empty: #eedfd9;
+  --rose: #d99aa8; --blush: #f2d9d6; --lavender: #b08a96;
+  --powder: #c49aa4; --peach: #e8bfae; --sage: #b3ab9c;
+}
+[data-theme='moonlight'] {
+  --paper: #20263a; --paper-2: #2a3250;
+  --ink: #e9edf7; --ink-soft: #a9b4d0; --line: #3a4468;
+  --accent: #93a8dd; --accent-deep: #7b90c9;
+  --on-accent: #1b2133; --ink-inverse: #1b2133; --veil-text: #fffdf8;
+  --danger: #d98a80; --danger-deep: #b3564d;
+  --banner: #2c3554; --cell-empty: #2e3656;
+  --rose: #8e6f8e; --blush: #4a4468; --lavender: #6f7fae;
+  --powder: #7d90c2; --peach: #8e7f72; --sage: #6f8a7d;
+}
+
+/* Screen-reader-only text */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+img,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
